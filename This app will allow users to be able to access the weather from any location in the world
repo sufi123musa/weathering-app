@@ -1,0 +1,42 @@
+# weathering-app
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.*;
+
+public class WeatherApp {
+
+    public static void main(String[] args) {
+        try {
+            String apiKey = "YOUR_API_KEY_HERE";
+            String city = "New York";
+            String url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
+
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JSONObject jsonObject = new JSONObject(response.toString());
+            JSONArray weatherArray = jsonObject.getJSONArray("weather");
+            JSONObject weatherObject = weatherArray.getJSONObject(0);
+            String description = weatherObject.getString("description");
+
+            JSONObject mainObject = jsonObject.getJSONObject("main");
+            double temperature = mainObject.getDouble("temp");
+
+            System.out.println("The weather in " + city + " is " + description + " and the temperature is " + temperature + " K.");
+
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+}
